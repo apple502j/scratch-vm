@@ -1062,7 +1062,10 @@ const parseBlock = function (sb2block, addBroadcastMsg, getVariableId, extension
             mutation: {
                 tagName: 'mutation',
                 proccode: procData[0], // e.g., "abc %n %b %s"
-                argumentnames: JSON.stringify(procData[1]), // e.g. ['arg1', 'arg2']
+                argumentnames: JSON.stringify(procData[1].map(
+                                                             encodedArg => encodedArg.replace("\\@", "@")
+                                                            )
+                                             ), // e.g. ['arg1', 'arg2']
                 argumentids: JSON.stringify(parseProcedureArgIds(procData[0])),
                 argumentdefaults: JSON.stringify(procData[2]), // e.g., [1, 'abc']
                 warp: procData[3], // Warp mode, e.g., true/false.
