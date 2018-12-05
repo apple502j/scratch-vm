@@ -21,6 +21,7 @@ const StageLayering = require('../engine/stage-layering');
 const {loadCostume} = require('../import/load-costume.js');
 const {loadSound} = require('../import/load-sound.js');
 const {deserializeCostume, deserializeSound} = require('./deserialize-assets.js');
+const {dropdownArgsMap, numArgsMap} = require('./sb2_arguments.js');
 
 // Constants used during deserialization of an SB2 file
 const CORE_EXTENSIONS = [
@@ -56,8 +57,9 @@ const parseProcedureArgMap = function (procCode) {
     ];
     const INPUT_PREFIX = 'input';
     let inputCount = 0;
-    // Split by %n, %b, %s.
-    const parts = procCode.split(/(?=[^\\]%[nbs])/);
+    // Split by %n, %b, %s, %c and other "hacked" arguments.
+    // eslint-disable-next-line max-len
+    const parts = procCode.split(/(?=[^\\]%(?:[nbsc]|m\.(?:var|list|attribute|sprite(?:OrStage|OrMouse|Only)|stageOrThis|mathOp|triggerSensor|broadcast|effect|timeAndDate|key|rotationStyle|stop|backdrop|costume|sound|touching|video(?:State|MotionType)|location|scrollAlign)|d\.(?:drum|note|instrument|direction|list(?:Item|DeleteItem))))/);
     for (let i = 0; i < parts.length; i++) {
         const part = parts[i].trim();
         if (part.substring(0, 1) === '%') {
@@ -72,6 +74,22 @@ const parseProcedureArgMap = function (procCode) {
                 arg.inputOp = 'text';
             } else if (argType === 'b') {
                 arg.inputOp = 'boolean';
+            } else if (argType === 'c') {
+                arg.inputOp = 'colour_picker';
+            } else if (argType === 'm' || argType === 'd') {
+                // Hacked arguments
+                const argSubType = part.substring(3).split(' ')[0];
+                log.warn(`Hacked arguments found: ${argSubType}`);
+                if (argType === 'm' && argSubType in dropdownArgsMap) {
+                    log.warn('Hacked arguments type: dropdown');
+                    arg.inputOp = dropdownArgsMap[argSubType];
+                } else if (argType === 'd' && argSubType in numArgsMap) {
+                    log.warn('Hacked arguments type: number');
+                    arg.inputOp = numArgsMap[argSubType];
+                } else {
+                    log.warn('Hacked arguments type: invalid');
+                    arg.inputOp = 'text';
+                }
             }
             argMap.push(arg);
         }
