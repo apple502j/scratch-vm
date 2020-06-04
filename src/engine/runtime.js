@@ -2542,7 +2542,7 @@ class Runtime extends EventEmitter {
      * Emit an event to indicate turbo mode status has changed.
      */
     requestTurboModeUpdate () {
-        if (this.runtime.turboMode) {
+        if (this.turboMode) {
             this.emit(Runtime.TURBO_MODE_ON);
         } else {
             this.emit(Runtime.TURBO_MODE_OFF);
