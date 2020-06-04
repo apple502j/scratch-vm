@@ -161,4 +161,4 @@ class AppleProBlocks {
     }
 }
 
-export default AppleProBlocks;
+module.exports = AppleProBlocks;
