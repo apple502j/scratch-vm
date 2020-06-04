@@ -139,11 +139,15 @@ class AppleProBlocks {
         }
     }
 
-    setCompatibilityMode (args) {
+    setCompatibilityMode (/* args */) {
+        // no-op
+        return;
+        /*
         const compatibilityMode = Cast.toNumber(args.FPS) !== 60;
         if (compatibilityMode !== this.runtime.compatibilityMode) {
             this.runtime.setCompatibilityMode(compatibilityMode);
         }
+        */
     }
 
     setTargetFencing (args, util) {
