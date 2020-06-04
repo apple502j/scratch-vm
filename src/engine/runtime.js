@@ -2110,7 +2110,7 @@ class Runtime extends EventEmitter {
 
     /**
      * Set whether we are in 30 TPS compatibility mode.
-     * @param {boolean} compatibilityModeOn True iff in compatibility mode.
+     * @param {boolean} compatibilityModeOn True if in compatibility mode.
      */
     setCompatibilityMode (compatibilityModeOn) {
         this.compatibilityMode = compatibilityModeOn;
@@ -2355,15 +2355,17 @@ class Runtime extends EventEmitter {
     /**
      * Get the first original (non-clone-block-created) sprite given a name.
      * @param {string} spriteName Name of sprite to look for.
+     * @param {function} extraCheck Extra check for the target to return.
      * @return {?Target} Target representing a sprite of the given name.
      */
-    getSpriteTargetByName (spriteName) {
+    getSpriteTargetByName (spriteName, extraCheck) {
+        if (!extraCheck) extraCheck = () => true;
         for (let i = 0; i < this.targets.length; i++) {
             const target = this.targets[i];
             if (target.isStage) {
                 continue;
             }
-            if (target.sprite && target.sprite.name === spriteName) {
+            if (target.sprite && target.sprite.name === spriteName && extraCheck(target)) {
                 return target;
             }
         }
@@ -2534,6 +2536,17 @@ class Runtime extends EventEmitter {
      */
     requestToolboxExtensionsUpdate () {
         this.emit(Runtime.TOOLBOX_EXTENSIONS_NEED_UPDATE);
+    }
+
+    /**
+     * Emit an event to indicate turbo mode status has changed.
+     */
+    requestTurboModeUpdate () {
+        if (this.runtime.turboMode) {
+            this.emit(Runtime.TURBO_MODE_ON);
+        } else {
+            this.emit(Runtime.TURBO_MODE_OFF);
+        }
     }
 
     /**

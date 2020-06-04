@@ -161,6 +161,18 @@ class RenderedTarget extends Target {
          * @type {string}
          */
         this.textToSpeechLanguage = null;
+
+        /**
+         * Whether fencing is enabled or not.
+         * @type {boolean}
+         */
+        this.fencingEnabled = true;
+
+        /**
+         * Whether blocks that detect targets can see the target or not.
+         * @type {boolean}
+        */
+        this.detectable = true;
     }
 
     /**
@@ -269,7 +281,8 @@ class RenderedTarget extends Target {
         const oldX = this.x;
         const oldY = this.y;
         if (this.renderer) {
-            const position = this.renderer.getFencedPositionOfDrawable(this.drawableID, [x, y]);
+            let position = [x, y];
+            if (this.fencingEnabled) position = this.renderer.getFencedPositionOfDrawable(this.drawableID, [x, y]);
             this.x = position[0];
             this.y = position[1];
 
@@ -799,6 +812,7 @@ class RenderedTarget extends Target {
         // can detect other sprites using touching <sprite>, but cannot be detected
         // by other sprites while it is being dragged. This matches Scratch 2.0 behavior.
         const drawableCandidates = firstClone.sprite.clones.filter(clone => !clone.dragging)
+            .filter(clone => clone.detectable)
             .map(clone => clone.drawableID);
         return this.renderer.isTouchingDrawables(
             this.drawableID, drawableCandidates);
@@ -913,6 +927,7 @@ class RenderedTarget extends Target {
      * @return {Array.<number>} Fenced X and Y coordinates.
      */
     keepInFence (newX, newY, optFence) {
+        if (!this.fencingEnabled) return [newX, newY];
         let fence = optFence;
         if (!fence) {
             fence = {

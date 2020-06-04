@@ -193,7 +193,8 @@ class Scratch3SensingBlocks {
         } else {
             args.DISTANCETOMENU = Cast.toString(args.DISTANCETOMENU);
             const distTarget = this.runtime.getSpriteTargetByName(
-                args.DISTANCETOMENU
+                args.DISTANCETOMENU,
+                t => t.detectable
             );
             if (!distTarget) return 10000;
             targetX = distTarget.x;
